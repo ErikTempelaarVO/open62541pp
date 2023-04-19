@@ -18,12 +18,17 @@
 
 namespace opcua {
 
+class ServerConfig;
+
 /* ----------------------------------------- Connection ----------------------------------------- */
 
 class Server::Connection {
 public:
     Connection()
         : server_(UA_Server_new()) {}
+
+    Connection(const ServerConfig& config)
+        : server_(UA_Server_newWithConfig(config.toNative())) {}
 
     ~Connection() {
         // don't use stop method here because it might throw an exception
@@ -147,6 +152,10 @@ Server::Server(uint16_t port, std::string_view certificate)
     );
     detail::throwOnBadStatus(status);
     connection_->applyDefaults();
+}
+
+Server::Server(const ServerConfig& config)
+    : connection_(std::make_shared<Connection>(config)) {
 }
 
 void Server::setLogger(Logger logger) {

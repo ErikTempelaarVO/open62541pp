@@ -1,6 +1,7 @@
 set(examples_sources
     server.cpp
     server_instantiation.cpp
+    serverconfig.cpp
 )
 
 foreach(source ${examples_sources})

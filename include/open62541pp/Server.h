@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "open62541pp/Logger.h"
+#include "open62541pp/ServerConfig.h"
 
 // forward declaration open62541
 struct UA_Server;
@@ -38,6 +39,8 @@ public:
     explicit Server(uint16_t port);
     /// Create server with custom port and a server certificate.
     Server(uint16_t port, std::string_view certificate);
+    /// Create server with ServerConfig
+    explicit Server(const ServerConfig& config);
 
     /// Set custom logging function.
     void setLogger(Logger logger);
