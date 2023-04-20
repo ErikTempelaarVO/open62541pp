@@ -5,12 +5,13 @@
 #include <iterator>  // distance
 #include <string>
 #include <type_traits>
+#include <vector>
 
 #include "open62541pp/Common.h"
 #include "open62541pp/ErrorHandling.h"
-#include "open62541pp/Helper.h"
-#include "open62541pp/Traits.h"
 #include "open62541pp/TypeWrapper.h"
+#include "open62541pp/detail/helper.h"
+#include "open62541pp/detail/traits.h"
 #include "open62541pp/open62541.h"
 #include "open62541pp/types/DateTime.h"
 
@@ -276,10 +277,10 @@ struct TypeConverter<UA_ExtensionObject>
 
 template <typename WrapperType>
 struct TypeConverter<WrapperType, std::enable_if_t<detail::IsTypeWrapper<WrapperType>::value>> {
-    using NativeConverter = TypeConverter<typename WrapperType::UaType>;
+    using NativeConverter = TypeConverter<typename WrapperType::NativeType>;
 
     using ValueType = WrapperType;
-    using NativeType = typename WrapperType::UaType;
+    using NativeType = typename WrapperType::NativeType;
     using ValidTypes = TypeList<WrapperType::getType()>;
 
     static void fromNative(const NativeType& src, ValueType& dst) {
@@ -287,7 +288,7 @@ struct TypeConverter<WrapperType, std::enable_if_t<detail::IsTypeWrapper<Wrapper
     }
 
     static void toNative(const ValueType& src, NativeType& dst) {
-        NativeConverter::toNative(dst, src.handle());
+        NativeConverter::toNative(*src.handle(), dst);
     }
 };
 
@@ -316,7 +317,7 @@ struct TypeConverter<std::chrono::time_point<Clock, Duration>> {
     using ValidTypes = TypeList<Type::DateTime>;
 
     static void fromNative(const NativeType& src, ValueType& dst) {
-        dst = DateTime(src).toTimePoint();
+        dst = DateTime(src).toTimePoint<Clock, Duration>();
     }
 
     static void toNative(const ValueType& src, NativeType& dst) {

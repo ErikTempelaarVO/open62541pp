@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.12)
 
 project(
     open62541++
-    VERSION 0.1.0
+    VERSION 0.2.0
     DESCRIPTION "C++ wrapper for open62541"
     HOMEPAGE_URL "https://github.com/open62541pp/open62541pp"
     LANGUAGES CXX
@@ -97,10 +97,13 @@ endif()
 # open62541pp library (static/shared depending on option BUILD_SHARED_LIBS)
 add_library(
     open62541pp
-    src/Helper.cpp
-    src/Node.cpp
+    src/Client.cpp
+    src/CustomLogger.cpp
     src/Server.cpp
+    src/detail/helper.cpp
+    src/overloads/ostream.cpp
     src/services/Attribute.cpp
+    src/services/Browse.cpp
     src/services/NodeManagement.cpp
     src/types/Builtin.cpp
     src/types/DataValue.cpp
@@ -138,12 +141,18 @@ if(UAPP_BUILD_TESTS AND UAPP_ENABLE_COVERAGE)
             COMMENT "Generate coverage report"
             WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
         )
+        add_custom_target(
+            open62541pp_coverage_report_xml
+            COMMAND ${GCOVR_EXE} ${gcovr_args} "--xml" "${CMAKE_BINARY_DIR}/coverage.xml"
+            COMMENT "Generate coverage report (xml/cobertura)"
+            WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        )
         set(coverage_html_output_dir "${CMAKE_BINARY_DIR}/coverage_html")
         make_directory(${coverage_html_output_dir})
         add_custom_target(
             open62541pp_coverage_report_html
             COMMAND ${GCOVR_EXE} ${gcovr_args} "--html-details" "${coverage_html_output_dir}/index.html"
-            COMMENT "Generate HTML coverage report"
+            COMMENT "Generate coverage report (html)"
             WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
         )
     endif()
