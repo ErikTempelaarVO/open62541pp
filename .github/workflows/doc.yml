@@ -5,26 +5,27 @@ on:
     branches: [master]
   release:
     types: [published]
+  workflow_dispatch:
 
 jobs:
   doc:
     runs-on: ubuntu-22.04
     steps:
-      - name: Install requirements
-        run: |
-          sudo apt update
-          sudo apt install -y doxygen graphviz
       - uses: actions/checkout@v3
         with:
           submodules: recursive
-      - name: Build doc with CMake
+      - uses: aminya/setup-cpp@v1
+        with:
+          doxygen: true
+          graphviz: true
+      - name: Build documentation
         run: |
           mkdir build
           cd build
           cmake -DUAPP_BUILD_DOCUMENTATION=ON ..
           cmake --build . --target open62541pp_doc
       - name: Deploy
-        if: ${{ github.event_name == 'release' }}
+        if: (github.event_name == 'release' || github.event_name == 'workflow_dispatch')
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}

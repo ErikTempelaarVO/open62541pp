@@ -4,14 +4,15 @@
 #include "open62541pp/open62541pp.h"
 
 int main(int argc, char* argv[]) {
-    CliParser parser(argc, argv);
+    const CliParser parser(argc, argv);
     if (parser.nargs() < 2 || parser.hasFlag("-h") || parser.hasFlag("--help")) {
-        std::cout << "usage: client_connect [options] opc.tcp://<host>:<port>\n"
-                  << "options:\n"
-                  << "  --username <name>\n"
-                  << "  --password <password>\n"
-                  << "  --help, -h\n"
-                  << std::flush;
+        std::cout
+            << "usage: client_connect [options] opc.tcp://<host>:<port>\n"
+            << "options:\n"
+            << "  --username <name>\n"
+            << "  --password <password>\n"
+            << "  --help, -h\n"
+            << std::flush;
         return 2;
     }
 
@@ -30,8 +31,8 @@ int main(int argc, char* argv[]) {
         client.connect(serverUrl);
     }
 
-    auto node = client.getNode({0, UA_NS0ID_SERVER_SERVERSTATUS_CURRENTTIME});
-    const auto dt = node.readScalar<opcua::DateTime>();
+    auto node = client.getNode(opcua::VariableId::Server_ServerStatus_CurrentTime);
+    const auto dt = node.readValueScalar<opcua::DateTime>();
     client.disconnect();
 
     std::cout << "Server date (UTC): " << dt.format("%Y-%m-%d %H:%M:%S") << std::endl;

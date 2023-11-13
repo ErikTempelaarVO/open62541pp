@@ -9,11 +9,14 @@
 
 namespace opcua {
 
+/// Type index of the ::UA_TYPES array.
+using TypeIndex = uint16_t;
+
 /**
  * Built-in types.
- * @see https://reference.opcfoundation.org/v104/Core/docs/Part6/5.1.2/
+ * @see https://reference.opcfoundation.org/Core/Part6/v105/docs/5.1.2
  */
-enum class Type : uint16_t {
+enum class Type : TypeIndex {
     // clang-format off
     Boolean         = UA_TYPES_BOOLEAN,
     SByte           = UA_TYPES_SBYTE,
@@ -44,20 +47,58 @@ enum class Type : uint16_t {
 };
 
 /**
+ * Attribute identifiers.
+ * @see UA_AttributeId
+ * @see https://reference.opcfoundation.org/Core/Part6/v105/docs/A.1/
+ */
+enum class AttributeId : uint32_t {
+    // clang-format off
+    NodeId                  = 1,
+    NodeClass               = 2,
+    BrowseName              = 3,
+    DisplayName             = 4,
+    Description             = 5,
+    WriteMask               = 6,
+    UserWriteMask           = 7,
+    IsAbstract              = 8,
+    Symmetric               = 9,
+    InverseName             = 10,
+    ContainsNoLoops         = 11,
+    EventNotifier           = 12,
+    Value                   = 13,
+    DataType                = 14,
+    ValueRank               = 15,
+    ArrayDimensions         = 16,
+    AccessLevel             = 17,
+    UserAccessLevel         = 18,
+    MinimumSamplingInterval = 19,
+    Historizing             = 20,
+    Executable              = 21,
+    UserExecutable          = 22,
+    DataTypeDefinition      = 23,
+    RolePermissions         = 24,
+    UserRolePermissions     = 25,
+    AccessRestrictions      = 26,
+    AccessLevelEx           = 27,
+    // clang-format on
+};
+
+/**
  * Node classes.
  * @see UA_NodeClass
+ * @see https://reference.opcfoundation.org/Core/Part3/v105/docs/8.29
  */
-enum class NodeClass : uint16_t {
+enum class NodeClass : uint32_t {
     // clang-format off
-    Unspecified   = UA_NODECLASS_UNSPECIFIED,
-    Object        = UA_NODECLASS_OBJECT,
-    Variable      = UA_NODECLASS_VARIABLE,
-    Method        = UA_NODECLASS_METHOD,
-    ObjectType    = UA_NODECLASS_OBJECTTYPE,
-    VariableType  = UA_NODECLASS_VARIABLETYPE,
-    ReferenceType = UA_NODECLASS_REFERENCETYPE,
-    DataType      = UA_NODECLASS_DATATYPE,
-    View          = UA_NODECLASS_VIEW,
+    Unspecified   = 0,
+    Object        = 1,
+    Variable      = 2,
+    Method        = 4,
+    ObjectType    = 8,
+    VariableType  = 16,
+    ReferenceType = 32,
+    DataType      = 64,
+    View          = 128,
     // clang-format on
 };
 
@@ -101,72 +142,73 @@ enum class ValueRank : int32_t {
 };
 
 /**
- * Reference types.
- * @see https://reference.opcfoundation.org/v104/Core/ReferenceTypes/
- * Missing reference types in open62541?
- * - AliasFor
- * - HasReaderGroup
- * - HasWriterGroup
- */
-enum class ReferenceType : uint16_t {
-    // clang-format off
-    References                          = UA_NS0ID_REFERENCES,
-    NonHierarchicalReferences           = UA_NS0ID_NONHIERARCHICALREFERENCES,
-    HierarchicalReferences              = UA_NS0ID_HIERARCHICALREFERENCES,
-    HasChild                            = UA_NS0ID_HASCHILD,
-    Organizes                           = UA_NS0ID_ORGANIZES,
-    HasEventSource                      = UA_NS0ID_HASEVENTSOURCE,
-    HasModellingRule                    = UA_NS0ID_HASMODELLINGRULE,
-    HasEncoding                         = UA_NS0ID_HASENCODING,
-    HasDescription                      = UA_NS0ID_HASDESCRIPTION,
-    HasTypeDefinition                   = UA_NS0ID_HASTYPEDEFINITION,
-    GeneratesEvent                      = UA_NS0ID_GENERATESEVENT,
-    Aggregates                          = UA_NS0ID_AGGREGATES,
-    HasSubType                          = UA_NS0ID_HASSUBTYPE,
-    HasProperty                         = UA_NS0ID_HASPROPERTY,
-    HasComponent                        = UA_NS0ID_HASCOMPONENT,
-    HasNotifier                         = UA_NS0ID_HASNOTIFIER,
-    HasOrderedComponent                 = UA_NS0ID_HASORDEREDCOMPONENT,
-    FromState                           = UA_NS0ID_FROMSTATE,
-    ToState                             = UA_NS0ID_TOSTATE,
-    HasCause                            = UA_NS0ID_HASCAUSE,
-    HasEffect                           = UA_NS0ID_HASEFFECT,
-    HasHistoricalConfiguration          = UA_NS0ID_HASHISTORICALCONFIGURATION,
-    HasSubStateMachine                  = UA_NS0ID_HASSUBSTATEMACHINE,
-    HasArgumentDescription              = UA_NS0ID_HASARGUMENTDESCRIPTION,
-    HasOptionalInputArgumentDescription = UA_NS0ID_HASOPTIONALINPUTARGUMENTDESCRIPTION,
-    AlwaysGeneratesEvent                = UA_NS0ID_ALWAYSGENERATESEVENT,
-    HasTrueSubState                     = UA_NS0ID_HASTRUESUBSTATE,
-    HasFalseSubState                    = UA_NS0ID_HASFALSESUBSTATE,
-    HasCondition                        = UA_NS0ID_HASCONDITION,
-    HasPubSubConnection                 = UA_NS0ID_HASPUBSUBCONNECTION,
-    DataSetToWriter                     = UA_NS0ID_DATASETTOWRITER,
-    HasGuard                            = UA_NS0ID_HASGUARD,
-    HasDataSetWriter                    = UA_NS0ID_HASDATASETWRITER,
-    HasDataSetReader                    = UA_NS0ID_HASDATASETREADER,
-    HasAlarmSuppressionGroup            = UA_NS0ID_HASALARMSUPPRESSIONGROUP,
-    AlarmGroupMember                    = UA_NS0ID_ALARMGROUPMEMBER,
-    HasEffectDisable                    = UA_NS0ID_HASEFFECTDISABLE,
-    HasDictionaryEntry                  = UA_NS0ID_HASDICTIONARYENTRY,
-    HasInterface                        = UA_NS0ID_HASINTERFACE,
-    HasAddIn                            = UA_NS0ID_HASADDIN,
-    HasEffectEnable                     = UA_NS0ID_HASEFFECTENABLE,
-    HasEffectSuppressed                 = UA_NS0ID_HASEFFECTSUPPRESSED,
-    HasEffectUnsuppressed               = UA_NS0ID_HASEFFECTUNSUPPRESSED,
-    // clang-format on
-};
-
-/**
  * Modelling rules.
- * @see https://reference.opcfoundation.org/v104/Core/docs/Part3/6.4.4/
+ * @see https://reference.opcfoundation.org/Core/Part3/v105/docs/6.4.4
  */
 enum class ModellingRule : uint16_t {
     // clang-format off
     Mandatory            = UA_NS0ID_MODELLINGRULE_MANDATORY,
-    Optional             = UA_NS0ID_MODELLINGRULE_MANDATORY,
+    Optional             = UA_NS0ID_MODELLINGRULE_OPTIONAL,
     ExposesItsArray      = UA_NS0ID_MODELLINGRULE_EXPOSESITSARRAY,
     OptionalPlaceholder  = UA_NS0ID_MODELLINGRULE_OPTIONALPLACEHOLDER,
     MandatoryPlaceholder = UA_NS0ID_MODELLINGRULE_MANDATORYPLACEHOLDER,
+    // clang-format on
+};
+
+/**
+ * Browse direction.
+ * An enumeration that specifies the direction of references to follow.
+ * @see UA_BrowseDirection
+ * @see https://reference.opcfoundation.org/Core/Part4/v105/docs/7.5
+ */
+enum class BrowseDirection : uint32_t {
+    // clang-format off
+    Forward = 0,
+    Inverse = 1,
+    Both    = 2,
+    Invalid = 3,
+    // clang-format on
+};
+
+/**
+ * Timestamps to return.
+ * @see UA_TimestampsToReturn
+ * @see https://reference.opcfoundation.org/Core/Part4/v105/docs/7.40
+ */
+enum class TimestampsToReturn : uint32_t {
+    // clang-format off
+    Source   = 0,
+    Server   = 1,
+    Both     = 2,
+    Neither  = 3,
+    Invalid  = 4,
+    // clang-format on
+};
+
+/**
+ * Monitoring mode.
+ * @see UA_MonitoringMode
+ * @see https://reference.opcfoundation.org/Core/Part4/v105/docs/7.23
+ */
+enum class MonitoringMode : uint32_t {
+    // clang-format off
+    Disabled  = 0,
+    Sampling  = 1,
+    Reporting = 2,
+    // clang-format on
+};
+
+/**
+ * Message security mode.
+ * @see UA_MessageSecurityMode
+ * @see https://reference.opcfoundation.org/Core/Part4/v105/docs/7.20
+ */
+enum class MessageSecurityMode : uint32_t {
+    // clang-format off
+    Invalid        = 0,  ///< Will always be rejected
+    None           = 1,  ///< No security applied
+    Sign           = 2,  ///< All messages are signed but not encrypted
+    SignAndEncrypt = 3,  ///< All messages are signed and encrypted
     // clang-format on
 };
 
@@ -200,14 +242,7 @@ using BuiltinTypes = std::tuple<
     UA_DiagnosticInfo>;
 
 template <typename T>
-constexpr bool isBuiltinType() {
-    return TupleHolds<BuiltinTypes, T>::value;
-}
-
-// template <size_t Index>
-// using BuiltinType = std::tuple_element<Index, BuiltinTypes>;
-
-inline constexpr auto builtinTypesCount = std::tuple_size_v<BuiltinTypes>;
+inline constexpr bool isBuiltinType = TupleHolds<BuiltinTypes, T>::value;
 
 }  // namespace detail
 

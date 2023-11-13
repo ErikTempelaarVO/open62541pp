@@ -1,7 +1,6 @@
 #pragma once
 
 #include <cassert>
-#include <cstdint>
 #include <string>
 #include <string_view>
 
@@ -12,40 +11,31 @@ namespace opcua::detail {
 
 /// Get UA_DataType by type index or enum (template parameter).
 template <auto typeIndexOrEnum>
-inline const UA_DataType* getUaDataType() noexcept {
-    constexpr auto typeIndex = static_cast<uint16_t>(typeIndexOrEnum);
+inline const UA_DataType& getUaDataType() noexcept {
+    constexpr auto typeIndex = static_cast<TypeIndex>(typeIndexOrEnum);
     static_assert(typeIndex < UA_TYPES_COUNT);
-    return &UA_TYPES[typeIndex];  // NOLINT
+    return UA_TYPES[typeIndex];  // NOLINT
 }
 
 /// Get UA_DataType by type index.
-inline const UA_DataType* getUaDataType(uint16_t typeIndex) noexcept {
-    assert(typeIndex < UA_TYPES_COUNT);  // NOLINT
-    return &UA_TYPES[typeIndex];  // NOLINT
+inline const UA_DataType& getUaDataType(TypeIndex typeIndex) noexcept {
+    assert(typeIndex < UA_TYPES_COUNT);
+    return UA_TYPES[typeIndex];  // NOLINT
 }
 
 /// Get UA_DataType by type enum.
-inline const UA_DataType* getUaDataType(Type type) noexcept {
-    const auto typeIndex = static_cast<uint16_t>(type);
-    return getUaDataType(typeIndex);
+inline const UA_DataType& getUaDataType(Type type) noexcept {
+    return getUaDataType(static_cast<TypeIndex>(type));
 }
 
-/// Get (custom) UA_DataType by UA_NodeId.
+/// Find (custom) UA_DataType by UA_NodeId.
 /// Return nullptr if no matching data type was found.
-inline const UA_DataType* getUaDataType(const UA_NodeId& id) noexcept {
+inline const UA_DataType* findUaDataType(const UA_NodeId& id) noexcept {
     return UA_findDataType(&id);
 }
 
-/// Get NodeId by ReferenceType.
-inline UA_NodeId getUaNodeId(ReferenceType type) noexcept {
-    return UA_NODEID_NUMERIC(0, static_cast<UA_Int32>(type));
-}
-
-/// Allocate UA_String from const char*
-[[nodiscard]] UA_String allocUaString(const char* src);
-
-/// Allocate UA_String from std::string
-[[nodiscard]] UA_String allocUaString(const std::string& src);
+/// Convert std::string_view to UA_String (no copy)
+UA_String toUaString(std::string_view src) noexcept;
 
 /// Allocate UA_String from std::string_view
 [[nodiscard]] UA_String allocUaString(std::string_view src);
