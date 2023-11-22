@@ -7,14 +7,16 @@
 #include <string_view>
 #include <vector>
 
-// Workaround for GCC 7 with partial C++17 support
+// Workaround for GCC 7 with partial (or missing) C++17 support
 // https://github.com/open62541pp/open62541pp/issues/109
-#if !__has_include(<filesystem>) && __has_include(<experimental/filesystem>)
+#if __has_include(<filesystem>)
+#include <filesystem>
+namespace fs = std::filesystem;
+#elif __has_include(<experimental/filesystem>)
 #include <experimental/filesystem>
 namespace fs = std::experimental::filesystem;
 #else
-#include <filesystem>
-namespace fs = std::filesystem;
+#define NO_STD_FS 1
 #endif
 
 #include "open62541pp/ErrorHandling.h"
@@ -144,14 +146,18 @@ public:
     explicit ByteString(const std::vector<uint8_t>& bytes);
 
     /// Read ByteString from binary file.
+#ifndef NO_STD_FS
     static ByteString fromFile(const fs::path& filepath);
+#endif
 
     /// Parse ByteString from Base64 encoded string.
     /// @note Only supported since open62541 v1.1
     static ByteString fromBase64(std::string_view encoded);
 
     /// Write ByteString to binary file.
+#ifndef NO_STD_FS
     void toFile(const fs::path& filepath) const;
+#endif
 
     /// Convert to Base64 encoded string.
     /// @note Only supported since open62541 v1.1
