@@ -2,9 +2,7 @@
 
 #include <cstdint>
 #include <string_view>
-#include <tuple>
 
-#include "open62541pp/detail/traits.h"
 #include "open62541pp/open62541.h"
 
 namespace opcua {
@@ -51,7 +49,7 @@ enum class Type : TypeIndex {
  * @see UA_AttributeId
  * @see https://reference.opcfoundation.org/Core/Part6/v105/docs/A.1/
  */
-enum class AttributeId : uint32_t {
+enum class AttributeId : int32_t {
     // clang-format off
     NodeId                  = 1,
     NodeClass               = 2,
@@ -88,7 +86,7 @@ enum class AttributeId : uint32_t {
  * @see UA_NodeClass
  * @see https://reference.opcfoundation.org/Core/Part3/v105/docs/8.29
  */
-enum class NodeClass : uint32_t {
+enum class NodeClass : int32_t {
     // clang-format off
     Unspecified   = 0,
     Object        = 1,
@@ -161,7 +159,7 @@ enum class ModellingRule : uint16_t {
  * @see UA_BrowseDirection
  * @see https://reference.opcfoundation.org/Core/Part4/v105/docs/7.5
  */
-enum class BrowseDirection : uint32_t {
+enum class BrowseDirection : int32_t {
     // clang-format off
     Forward = 0,
     Inverse = 1,
@@ -175,55 +173,41 @@ enum class BrowseDirection : uint32_t {
  * @see UA_TimestampsToReturn
  * @see https://reference.opcfoundation.org/Core/Part4/v105/docs/7.40
  */
-enum class TimestampsToReturn : uint32_t {
+enum class TimestampsToReturn : int32_t {
     // clang-format off
     Source   = 0,
     Server   = 1,
     Both     = 2,
-    Neighter = 3,
+    Neither  = 3,
     Invalid  = 4,
     // clang-format on
 };
 
-namespace detail {
+/**
+ * Monitoring mode.
+ * @see UA_MonitoringMode
+ * @see https://reference.opcfoundation.org/Core/Part4/v105/docs/7.23
+ */
+enum class MonitoringMode : int32_t {
+    // clang-format off
+    Disabled  = 0,
+    Sampling  = 1,
+    Reporting = 2,
+    // clang-format on
+};
 
-using BuiltinTypes = std::tuple<
-    UA_Boolean,
-    UA_SByte,
-    UA_Byte,
-    UA_Int16,
-    UA_UInt16,
-    UA_Int32,
-    UA_UInt32,
-    UA_Int64,
-    UA_UInt64,
-    UA_Float,
-    UA_Double,
-    UA_String,
-    UA_DateTime,
-    UA_Guid,
-    UA_ByteString,
-    UA_XmlElement,
-    UA_NodeId,
-    UA_ExpandedNodeId,
-    UA_StatusCode,
-    UA_QualifiedName,
-    UA_LocalizedText,
-    UA_ExtensionObject,
-    UA_DataValue,
-    UA_Variant,
-    UA_DiagnosticInfo>;
-
-template <typename T>
-constexpr bool isBuiltinType() {
-    return TupleHolds<BuiltinTypes, T>::value;
-}
-
-// template <size_t Index>
-// using BuiltinType = std::tuple_element<Index, BuiltinTypes>;
-
-inline constexpr auto builtinTypesCount = std::tuple_size_v<BuiltinTypes>;
-
-}  // namespace detail
+/**
+ * Message security mode.
+ * @see UA_MessageSecurityMode
+ * @see https://reference.opcfoundation.org/Core/Part4/v105/docs/7.20
+ */
+enum class MessageSecurityMode : int32_t {
+    // clang-format off
+    Invalid        = 0,  ///< Will always be rejected
+    None           = 1,  ///< No security applied
+    Sign           = 2,  ///< All messages are signed but not encrypted
+    SignAndEncrypt = 3,  ///< All messages are signed and encrypted
+    // clang-format on
+};
 
 }  // namespace opcua

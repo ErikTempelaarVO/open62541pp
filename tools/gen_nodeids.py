@@ -13,6 +13,13 @@ TEMPLATE_HEADER = """
 
 #pragma once
 
+// ignore (false-positive?) warning of GCC:
+// declaration of ‘MonitoringParameters’ shadows a global declaration
+#ifndef _MSC_VER
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wshadow"
+#endif
+
 namespace opcua {{
 
 /**
@@ -28,6 +35,10 @@ namespace opcua {{
 // clang-format on
 
 }}  // namespace opcua
+
+#ifndef _MSC_VER
+#pragma GCC diagnostic pop
+#endif
 """.lstrip()
 
 TEMPLATE_ENUM = """
@@ -36,7 +47,7 @@ TEMPLATE_ENUM = """
  * @see https://reference.opcfoundation.org/Core/Part6/v105/docs/A.3
  * @ingroup NodeIds
  */
-enum class {enum_name} : uint32_t {{
+enum class {enum_name} : int32_t {{
 {body}
 }};
 """.strip()

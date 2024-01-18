@@ -3,6 +3,8 @@
 #include <chrono>
 #include <cstdint>
 #include <ratio>
+#include <string>
+#include <string_view>
 
 #include "open62541pp/TypeWrapper.h"
 #include "open62541pp/open62541.h"
@@ -24,24 +26,24 @@ public:
     using UaDuration = std::chrono::duration<int64_t, std::ratio<1, 10'000'000>>;
 
     // NOLINTNEXTLINE, false positive?
-    using TypeWrapperBase::TypeWrapperBase;  // inherit contructors
+    using TypeWrapperBase::TypeWrapperBase;  // inherit constructors
 
     template <typename Clock, typename Duration>
     DateTime(std::chrono::time_point<Clock, Duration> timePoint)  // NOLINT, implicit wanted
         : DateTime(fromTimePoint(timePoint)) {}
 
     /// Get current DateTime.
-    static DateTime now();
+    static DateTime now() noexcept;
 
     /// Get DateTime from std::chrono::time_point.
     template <typename Clock, typename Duration>
     static DateTime fromTimePoint(std::chrono::time_point<Clock, Duration> timePoint);
 
     /// Get DateTime from Unix time.
-    static DateTime fromUnixTime(int64_t unixTime);
+    static DateTime fromUnixTime(int64_t unixTime) noexcept;
 
     /// Offset of local time to UTC.
-    static int64_t localTimeUtcOffset();
+    static int64_t localTimeUtcOffset() noexcept;
 
     /// Convert to std::chrono::time_point.
     template <typename Clock = DefaultClock, typename Duration = UaDuration>
@@ -51,7 +53,7 @@ public:
     int64_t toUnixTime() const noexcept;
 
     /// Convert to UA_DateTimeStruct.
-    UA_DateTimeStruct toStruct() const;
+    UA_DateTimeStruct toStruct() const noexcept;
 
     /// Get DateTime value as 100 nanosecond intervals since January 1, 1601 (UTC).
     int64_t get() const noexcept;

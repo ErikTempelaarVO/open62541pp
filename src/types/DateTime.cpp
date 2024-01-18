@@ -4,19 +4,17 @@
 #include <iomanip>  // put_time
 #include <sstream>
 
-#include "../open62541_impl.h"
-
 namespace opcua {
 
-DateTime DateTime::now() {
+DateTime DateTime::now() noexcept {
     return DateTime(UA_DateTime_now());  // NOLINT
 }
 
-DateTime DateTime::fromUnixTime(int64_t unixTime) {
+DateTime DateTime::fromUnixTime(int64_t unixTime) noexcept {
     return DateTime(UA_DateTime_fromUnixTime(unixTime));  // NOLINT
 }
 
-int64_t DateTime::localTimeUtcOffset() {
+int64_t DateTime::localTimeUtcOffset() noexcept {
     return UA_DateTime_localTimeUtcOffset();
 }
 
@@ -27,7 +25,7 @@ int64_t DateTime::toUnixTime() const noexcept {
     return UA_DateTime_toUnixTime(get());
 }
 
-UA_DateTimeStruct DateTime::toStruct() const {
+UA_DateTimeStruct DateTime::toStruct() const noexcept {
     return UA_DateTime_toStruct(get());
 }
 
@@ -37,12 +35,10 @@ int64_t DateTime::get() const noexcept {
 
 std::string DateTime::format(std::string_view format, bool localtime) const {
     const std::time_t unixTime = toUnixTime();
-    const std::string formatStr(format);
-    std::stringstream ss;
-    if (localtime) {
-        ss << std::put_time(std::localtime(&unixTime), formatStr.c_str());
-    } else {
-        ss << std::put_time(std::gmtime(&unixTime), formatStr.c_str());
+    std::ostringstream ss;
+    const auto* timeinfo = localtime ? std::localtime(&unixTime) : std::gmtime(&unixTime);
+    if (timeinfo != nullptr) {
+        ss << std::put_time(timeinfo, std::string(format).c_str());
     }
     return ss.str();
 }
