@@ -76,19 +76,15 @@ ClientConfig::ClientConfig(
     const ByteString& certificate,
     const ByteString& privateKey,
     Span<const ByteString> trustList,
-    Span<const ByteString> revocationList
+    Span<const ByteString> revocationList,
+    LogFunction func
 ) {
-    auto voidLogger = static_cast<UA_Logger*>(UA_malloc(sizeof(UA_Logger)));
-    voidLogger->log = [](void*, UA_LogLevel, UA_LogCategory, const char*, va_list) {};
-    voidLogger->context = nullptr;
-    voidLogger->clear = [](UA_Logger* logger) {
-        if (logger != nullptr) {
-            UA_free(logger);  // NOLINT
-            logger = nullptr;
-        }
-    };
-
-    handle()->logging = voidLogger;  // set null logger to prevent logging from open62541 during encryption setup
+    if (func) {
+        auto adapter = std::make_unique<LoggerDefault>(std::move(func));
+        auto logger = static_cast<UA_Logger*>(UA_malloc(sizeof(UA_Logger)));
+        *logger = adapter.release()->create(true);
+        handle()->logging = logger;  // set logger before encryption setup to log potential errors
+    }
 
     throwIfBad(UA_ClientConfig_setDefaultEncryption(
         handle(),

@@ -66,7 +66,8 @@ public:
         const ByteString& certificate,
         const ByteString& privateKey,
         Span<const ByteString> trustList,
-        Span<const ByteString> revocationList = {}
+        Span<const ByteString> revocationList = {},
+        LogFunction func = {}
     );
 #endif
 

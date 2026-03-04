@@ -288,23 +288,37 @@ TEST_CASE("Client methods") {
     }
 }
 
-TEST_CASE("ClientConfig logger lifecycle") {
-    SECTION("Static null logger during encryption setup") {
 
-        // This doesn't crash
-        CHECK_NOTHROW([]() {
-            ClientConfig config(ByteString{}, ByteString{}, {}, {});
+
+TEST_CASE("ClientConfig voidLogger") {
+    bool logFuncCalled = false;
+    auto logFunc = [&](LogLevel, LogCategory, std::string_view) {
+        logFuncCalled = true;
+    };
+
+    SECTION("ClientConfig with logFunc (voidLogger)") {
+
+         CHECK_NOTHROW([&]() {
+            ClientConfig config(ByteString{}, ByteString{}, {}, {}, logFunc);
             Client(std::move(config));
+            CHECK(logFuncCalled);
         }());
     }
 
-    SECTION("Static null logger during encryption setup") {
+    SECTION("ClientConfig with default stdout logger") {
 
-        // This crashes during destruction of the Client
-        CHECK_NOTHROW([]() {
+        CHECK_NOTHROW([&]() {
             ClientConfig config(ByteString{}, ByteString{}, {}, {});
-            config.setLogger([&](auto, auto, auto) {});
             Client(std::move(config));
+            CHECK(!logFuncCalled);
+        }());
+    }
+
+    SECTION("ClientConfig with logFunc and setLogger") {
+         CHECK_NOTHROW([&]() {
+            ClientConfig config(ByteString{}, ByteString{}, {}, {}, logFunc);
+            CHECK(logFuncCalled);
+            config.setLogger(logFunc);
         }());
     }
 }
