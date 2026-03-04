@@ -296,17 +296,39 @@ TEST_CASE("ClientConfig voidLogger") {
         logFuncCalled = true;
     };
 
-    SECTION("ClientConfig with logFunc (voidLogger)") {
+    SECTION("Default constructor default stdout logger") {
+        CHECK_NOTHROW([]() {
+            ClientConfig config;
+            Client(std::move(config));
+        }());
+    }
 
-         CHECK_NOTHROW([&]() {
+    SECTION("Default constructor with custom logger") {
+        CHECK_NOTHROW([&]() {
+            logFuncCalled = false;
+            ClientConfig config(logFunc);
+            Client(std::move(config));
+        }());
+    }
+
+    SECTION("Default constructor with empty logger function") {
+        CHECK_NOTHROW([]() {
+            ClientConfig config(LogFunction{});
+            Client(std::move(config));
+        }());
+    }
+
+#ifdef UA_ENABLE_ENCRYPTION
+    SECTION("Encryption constructor with custom logger") {
+        CHECK_NOTHROW([&]() {
+            logFuncCalled = false;
             ClientConfig config(ByteString{}, ByteString{}, {}, {}, logFunc);
             Client(std::move(config));
             CHECK(logFuncCalled);
         }());
     }
 
-    SECTION("ClientConfig with default stdout logger") {
-
+    SECTION("Encryption constructor with default stdout logger") {
         CHECK_NOTHROW([&]() {
             ClientConfig config(ByteString{}, ByteString{}, {}, {});
             Client(std::move(config));
@@ -314,11 +336,22 @@ TEST_CASE("ClientConfig voidLogger") {
         }());
     }
 
-    SECTION("ClientConfig with logFunc and setLogger") {
-         CHECK_NOTHROW([&]() {
+    SECTION("Encryption constructor with custom logger and setLogger") {
+        CHECK_NOTHROW([&]() {
+            logFuncCalled = false;
             ClientConfig config(ByteString{}, ByteString{}, {}, {}, logFunc);
             CHECK(logFuncCalled);
+            logFuncCalled = false;
             config.setLogger(logFunc);
+            Client(std::move(config));
         }());
     }
+
+    SECTION("Encryption constructor with empty logger function") {
+        CHECK_NOTHROW([]() {
+            ClientConfig config(ByteString{}, ByteString{}, {}, {}, LogFunction{});
+            Client(std::move(config));
+        }());
+    }
+#endif
 }

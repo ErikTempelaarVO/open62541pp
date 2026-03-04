@@ -67,7 +67,14 @@ void TypeHandler<UA_ClientConfig>::clear(UA_ClientConfig& config) noexcept {
 #endif
 }
 
-ClientConfig::ClientConfig() {
+ClientConfig::ClientConfig(LogFunction func) {
+    if (func) {
+        auto adapter = std::make_unique<LoggerDefault>(std::move(func));
+        auto logger = static_cast<UA_Logger*>(UA_malloc(sizeof(UA_Logger)));
+        *logger = adapter.release()->create(true);
+        handle()->logging = logger;  // set logger before encryption setup to log potential errors
+    }
+                
     throwIfBad(UA_ClientConfig_setDefault(handle()));
 }
 
