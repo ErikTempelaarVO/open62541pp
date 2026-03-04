@@ -287,3 +287,24 @@ TEST_CASE("Client methods") {
         CHECK(namespaces.at(1) == "urn:open62541.server.application");
     }
 }
+
+TEST_CASE("ClientConfig logger lifecycle") {
+    SECTION("Static null logger during encryption setup") {
+
+        // This doesn't crash
+        CHECK_NOTHROW([]() {
+            ClientConfig config(ByteString{}, ByteString{}, {}, {});
+            Client(std::move(config));
+        }());
+    }
+
+    SECTION("Static null logger during encryption setup") {
+
+        // This crashes during destruction of the Client
+        CHECK_NOTHROW([]() {
+            ClientConfig config(ByteString{}, ByteString{}, {}, {});
+            config.setLogger([&](auto, auto, auto) {});
+            Client(std::move(config));
+        }());
+    }
+}
