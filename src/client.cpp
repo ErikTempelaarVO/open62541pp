@@ -78,12 +78,17 @@ ClientConfig::ClientConfig(
     Span<const ByteString> trustList,
     Span<const ByteString> revocationList
 ) {
-    static UA_Logger nullLogger;
-    nullLogger.log = [](void*, UA_LogLevel, UA_LogCategory, const char*, va_list) {};
-    nullLogger.context = nullptr;
-    nullLogger.clear = nullptr;  // Static logger should never be freed
+    auto voidLogger = static_cast<UA_Logger*>(UA_malloc(sizeof(UA_Logger)));
+    voidLogger->log = [](void*, UA_LogLevel, UA_LogCategory, const char*, va_list) {};
+    voidLogger->context = nullptr;
+    voidLogger->clear = [](UA_Logger* logger) {
+        if (logger != nullptr) {
+            UA_free(logger);  // NOLINT
+            logger = nullptr;
+        }
+    };
 
-    handle()->logging = &nullLogger;  // set null logger to prevent logging from open62541 during encryption setup
+    handle()->logging = voidLogger;  // set null logger to prevent logging from open62541 during encryption setup
 
     throwIfBad(UA_ClientConfig_setDefaultEncryption(
         handle(),
