@@ -45,8 +45,10 @@ public:
      * Create server config with default configuration.
      * Security policies:
      * - [None](http://opcfoundation.org/UA/SecurityPolicy#None)
+     *
+     * @param func Optional custom log function
      */
-    ServerConfig();
+    ServerConfig(LogFunction func = {});
 
     /**
      * Create server config with minimal configuration.
@@ -55,8 +57,13 @@ public:
      *
      * @param port Port number
      * @param certificate Optional X.509 v3 certificate in `DER` encoded format
+     * @param func Optional custom log function
      */
-    explicit ServerConfig(uint16_t port, const ByteString& certificate = {});
+    explicit ServerConfig(
+        uint16_t port,
+        const ByteString& certificate = {},
+        LogFunction func = {}
+    );
 
 #ifdef UA_ENABLE_ENCRYPTION
     /**
@@ -74,6 +81,7 @@ public:
      * @param trustList List of trusted certificates in `DER` encoded format
      * @param issuerList List of issuer certificates (i.e. CAs) in `DER` encoded format
      * @param revocationList Certificate revocation lists (CRL) in `DER` encoded format
+     * @param func Optional custom log function
      *
      * @see https://reference.opcfoundation.org/Core/Part2/v105/docs/9
      * @see https://reference.opcfoundation.org/Core/Part4/v105/docs/6.1
@@ -85,7 +93,8 @@ public:
         const ByteString& privateKey,
         Span<const ByteString> trustList,
         Span<const ByteString> issuerList,
-        Span<const ByteString> revocationList = {}
+        Span<const ByteString> revocationList = {},
+        LogFunction func = {}
     );
 #endif
 

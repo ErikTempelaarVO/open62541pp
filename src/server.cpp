@@ -26,11 +26,25 @@ void TypeHandler<UA_ServerConfig>::clear(UA_ServerConfig& config) noexcept {
     UA_ServerConfig_clean(&config);
 }
 
-ServerConfig::ServerConfig() {
+ServerConfig::ServerConfig(LogFunction func) {
+    if (func) {
+        auto adapter = std::make_unique<LoggerDefault>(std::move(func));
+        auto logger = static_cast<UA_Logger*>(UA_malloc(sizeof(UA_Logger)));
+        *logger = adapter.release()->create(true);
+        handle()->logging = logger;  // set logger before config setup to log potential errors
+    }
+
     throwIfBad(UA_ServerConfig_setDefault(handle()));
 }
 
-ServerConfig::ServerConfig(uint16_t port, const ByteString& certificate) {
+ServerConfig::ServerConfig(uint16_t port, const ByteString& certificate, LogFunction func) {
+    if (func) {
+        auto adapter = std::make_unique<LoggerDefault>(std::move(func));
+        auto logger = static_cast<UA_Logger*>(UA_malloc(sizeof(UA_Logger)));
+        *logger = adapter.release()->create(true);
+        handle()->logging = logger;  // set logger before config setup to log potential errors
+    }
+
     throwIfBad(UA_ServerConfig_setMinimal(
         handle(), port, certificate.empty() ? nullptr : certificate.handle()
     ));
@@ -43,8 +57,16 @@ ServerConfig::ServerConfig(
     const ByteString& privateKey,
     Span<const ByteString> trustList,
     Span<const ByteString> issuerList,
-    Span<const ByteString> revocationList
+    Span<const ByteString> revocationList,
+    LogFunction func
 ) {
+    if (func) {
+        auto adapter = std::make_unique<LoggerDefault>(std::move(func));
+        auto logger = static_cast<UA_Logger*>(UA_malloc(sizeof(UA_Logger)));
+        *logger = adapter.release()->create(true);
+        handle()->logging = logger;  // set logger before config setup to log potential errors
+    }
+
     throwIfBad(UA_ServerConfig_setDefaultWithSecurityPolicies(
         handle(),
         port,
