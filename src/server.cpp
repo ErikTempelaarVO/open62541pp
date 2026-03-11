@@ -31,7 +31,12 @@ ServerConfig::ServerConfig(LogFunction func) {
         auto adapter = std::make_unique<LoggerDefault>(std::move(func));
         auto logger = static_cast<UA_Logger*>(UA_malloc(sizeof(UA_Logger)));
         *logger = adapter.release()->create(true);
+#if UAPP_OPEN62541_VER_GE(1, 4)
         handle()->logging = logger;  // set logger before config setup to log potential errors
+#else
+        handle()->logger = *logger;  // copy logger before config setup to log potential errors
+        UA_free(logger);  // in older versions, logger is embedded, so free the allocated copy
+#endif
     }
 
     throwIfBad(UA_ServerConfig_setDefault(handle()));
@@ -42,7 +47,12 @@ ServerConfig::ServerConfig(uint16_t port, const ByteString& certificate, LogFunc
         auto adapter = std::make_unique<LoggerDefault>(std::move(func));
         auto logger = static_cast<UA_Logger*>(UA_malloc(sizeof(UA_Logger)));
         *logger = adapter.release()->create(true);
+#if UAPP_OPEN62541_VER_GE(1, 4)
         handle()->logging = logger;  // set logger before config setup to log potential errors
+#else
+        handle()->logger = *logger;  // copy logger before config setup to log potential errors
+        UA_free(logger);  // in older versions, logger is embedded, so free the allocated copy
+#endif
     }
 
     throwIfBad(UA_ServerConfig_setMinimal(
@@ -64,7 +74,12 @@ ServerConfig::ServerConfig(
         auto adapter = std::make_unique<LoggerDefault>(std::move(func));
         auto logger = static_cast<UA_Logger*>(UA_malloc(sizeof(UA_Logger)));
         *logger = adapter.release()->create(true);
+#if UAPP_OPEN62541_VER_GE(1, 4)
         handle()->logging = logger;  // set logger before config setup to log potential errors
+#else
+        handle()->logger = *logger;  // copy logger before config setup to log potential errors
+        UA_free(logger);  // in older versions, logger is embedded, so free the allocated copy
+#endif
     }
 
     throwIfBad(UA_ServerConfig_setDefaultWithSecurityPolicies(
