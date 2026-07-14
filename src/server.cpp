@@ -334,9 +334,8 @@ static void runStartup(Server& server, detail::ServerContext& context) {
 }
 
 uint16_t Server::runIterate() {
-    if (!context().running) {
-        runStartup(*this, context());
-    }
+    runStartup(*this, context());
+    const std::scoped_lock runLock{context().mutexRun};
     if (!context().running) {
         return 0;
     }
@@ -347,9 +346,6 @@ uint16_t Server::runIterate() {
 
 void Server::run() {
     runStartup(*this, context());
-    if (!context().running) {
-        return;
-    }
     const std::scoped_lock runLock{context().mutexRun};
     try {
         while (context().running) {
