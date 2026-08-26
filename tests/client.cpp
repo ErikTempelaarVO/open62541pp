@@ -287,3 +287,66 @@ TEST_CASE("Client methods") {
         CHECK(namespaces.at(1) == "urn:open62541.server.application");
     }
 }
+
+
+
+TEST_CASE("ClientConfig voidLogger") {
+    SECTION("Default constructor default stdout logger") {
+        CHECK_NOTHROW([]() {
+            ClientConfig config;
+            Client(std::move(config));
+        }());
+    }
+
+    SECTION("Default constructor with custom logger") {
+        auto logFunc = [](LogLevel, LogCategory, std::string_view) {};
+
+        CHECK_NOTHROW([&]() {
+            ClientConfig config(logFunc);
+            Client(std::move(config));
+        }());
+    }
+
+    SECTION("Default constructor with empty logger function") {
+        CHECK_NOTHROW([]() {
+            ClientConfig config(LogFunction{});
+            Client(std::move(config));
+        }());
+    }
+
+#ifdef UA_ENABLE_ENCRYPTION
+    SECTION("Encryption constructor with custom logger") {
+        auto logFunc = [](LogLevel, LogCategory, std::string_view) {};
+
+        CHECK_NOTHROW([&]() {
+            ClientConfig config(ByteString{}, ByteString{}, {}, {}, logFunc);
+            Client(std::move(config));
+        }());
+    }
+
+    SECTION("Encryption constructor with default stdout logger") {
+        CHECK_NOTHROW([]() {
+            ClientConfig config(ByteString{}, ByteString{}, {}, {});
+            Client(std::move(config));
+        }());
+    }
+
+    SECTION("setLogger replaces logger function") {
+        auto logFunc1 = [](LogLevel, LogCategory, std::string_view) {};
+        auto logFunc2 = [](LogLevel, LogCategory, std::string_view) {};
+
+        CHECK_NOTHROW([&]() {
+            ClientConfig config(ByteString{}, ByteString{}, {}, {}, logFunc1);
+            config.setLogger(logFunc2);
+            Client(std::move(config));
+        }());
+    }
+
+    SECTION("Encryption constructor with empty logger function") {
+        CHECK_NOTHROW([]() {
+            ClientConfig config(ByteString{}, ByteString{}, {}, {}, LogFunction{});
+            Client(std::move(config));
+        }());
+    }
+#endif
+}

@@ -329,3 +329,60 @@ TEST_CASE("DataSource") {
         CHECK_THROWS_MATCHES(node.writeValue(Variant{2}), BadStatus, Message("BadUnexpectedError"));
     }
 }
+
+TEST_CASE("ServerConfig with custom logger") {
+    SECTION("Default constructor with custom logger") {
+        auto logFunc = [](LogLevel, LogCategory, std::string_view) {};
+
+        CHECK_NOTHROW([&]() {
+            ServerConfig config(logFunc);
+            Server server(std::move(config));
+        }());
+    }
+
+    SECTION("Default constructor with empty logger") {
+        CHECK_NOTHROW([]() {
+            ServerConfig config(LogFunction{});
+            Server server(std::move(config));
+        }());
+    }
+
+    SECTION("Minimal constructor with custom logger") {
+        auto logFunc = [](LogLevel, LogCategory, std::string_view) {};
+
+        CHECK_NOTHROW([&]() {
+            ServerConfig config(4850, ByteString{}, logFunc);
+            Server server(std::move(config));
+        }());
+    }
+
+#ifdef UA_ENABLE_ENCRYPTION
+    SECTION("Encryption constructor with custom logger") {
+        auto logFunc = [](LogLevel, LogCategory, std::string_view) {};
+
+        CHECK_NOTHROW([&]() {
+            ServerConfig config(
+                4852,
+                ByteString{},  // certificate, invalid
+                ByteString{},  // privateKey, invalid
+                {},            // trustList
+                {},            // issuerList
+                {},            // revocationList
+                logFunc
+            );
+            Server server(std::move(config));
+        }());
+    }
+#endif
+
+    SECTION("setLogger replaces logger function") {
+        auto logFunc1 = [](LogLevel, LogCategory, std::string_view) {};
+        auto logFunc2 = [](LogLevel, LogCategory, std::string_view) {};
+
+        CHECK_NOTHROW([&]() {
+            ServerConfig config(logFunc1);
+            config.setLogger(logFunc2);
+            Server server(std::move(config));
+        }());
+    }
+}
