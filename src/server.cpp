@@ -27,37 +27,51 @@ void TypeHandler<UA_ServerConfig>::clear(UA_ServerConfig& config) noexcept {
 }
 
 ServerConfig::ServerConfig(LogFunction func) {
+#if UAPP_OPEN62541_VER_GE(1, 4)
     if (func) {
         auto adapter = std::make_unique<LoggerDefault>(std::move(func));
         auto logger = static_cast<UA_Logger*>(UA_malloc(sizeof(UA_Logger)));
         *logger = adapter.release()->create(true);
-#if UAPP_OPEN62541_VER_GE(1, 4)
         handle()->logging = logger;  // set logger before config setup to log potential errors
-#else
-        handle()->logger = *logger;  // copy logger before config setup to log potential errors
-        UA_free(logger);  // in older versions, logger is embedded, so free the allocated copy
-#endif
     }
+#endif
 
     throwIfBad(UA_ServerConfig_setDefault(handle()));
+
+#if UAPP_OPEN62541_VER_LE(1, 3)
+    if (func) {
+        auto adapter = std::make_unique<LoggerDefault>(std::move(func));
+        auto logger = static_cast<UA_Logger*>(UA_malloc(sizeof(UA_Logger)));
+        *logger = adapter.release()->create(true);
+        handle()->logger = *logger;  // copy logger after setup (setDefault overwrites it)
+        UA_free(logger);  // in older versions, logger is embedded, so free the allocated copy
+    }
+#endif
 }
 
 ServerConfig::ServerConfig(uint16_t port, const ByteString& certificate, LogFunction func) {
+#if UAPP_OPEN62541_VER_GE(1, 4)
     if (func) {
         auto adapter = std::make_unique<LoggerDefault>(std::move(func));
         auto logger = static_cast<UA_Logger*>(UA_malloc(sizeof(UA_Logger)));
         *logger = adapter.release()->create(true);
-#if UAPP_OPEN62541_VER_GE(1, 4)
         handle()->logging = logger;  // set logger before config setup to log potential errors
-#else
-        handle()->logger = *logger;  // copy logger before config setup to log potential errors
-        UA_free(logger);  // in older versions, logger is embedded, so free the allocated copy
-#endif
     }
+#endif
 
     throwIfBad(UA_ServerConfig_setMinimal(
         handle(), port, certificate.empty() ? nullptr : certificate.handle()
     ));
+
+#if UAPP_OPEN62541_VER_LE(1, 3)
+    if (func) {
+        auto adapter = std::make_unique<LoggerDefault>(std::move(func));
+        auto logger = static_cast<UA_Logger*>(UA_malloc(sizeof(UA_Logger)));
+        *logger = adapter.release()->create(true);
+        handle()->logger = *logger;  // copy logger after setup (setMinimal overwrites it)
+        UA_free(logger);  // in older versions, logger is embedded, so free the allocated copy
+    }
+#endif
 }
 
 #ifdef UA_ENABLE_ENCRYPTION
@@ -70,17 +84,14 @@ ServerConfig::ServerConfig(
     Span<const ByteString> revocationList,
     LogFunction func
 ) {
+#if UAPP_OPEN62541_VER_GE(1, 4)
     if (func) {
         auto adapter = std::make_unique<LoggerDefault>(std::move(func));
         auto logger = static_cast<UA_Logger*>(UA_malloc(sizeof(UA_Logger)));
         *logger = adapter.release()->create(true);
-#if UAPP_OPEN62541_VER_GE(1, 4)
         handle()->logging = logger;  // set logger before config setup to log potential errors
-#else
-        handle()->logger = *logger;  // copy logger before config setup to log potential errors
-        UA_free(logger);  // in older versions, logger is embedded, so free the allocated copy
-#endif
     }
+#endif
 
     throwIfBad(UA_ServerConfig_setDefaultWithSecurityPolicies(
         handle(),
@@ -94,6 +105,16 @@ ServerConfig::ServerConfig(
         asNative(revocationList.data()),
         revocationList.size()
     ));
+
+#if UAPP_OPEN62541_VER_LE(1, 3)
+    if (func) {
+        auto adapter = std::make_unique<LoggerDefault>(std::move(func));
+        auto logger = static_cast<UA_Logger*>(UA_malloc(sizeof(UA_Logger)));
+        *logger = adapter.release()->create(true);
+        handle()->logger = *logger;  // copy logger after setup (setDefaultWithSecurityPolicies overwrites it)
+        UA_free(logger);  // in older versions, logger is embedded, so free the allocated copy
+    }
+#endif
 }
 #endif
 
