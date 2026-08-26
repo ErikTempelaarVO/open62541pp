@@ -48,7 +48,7 @@ public:
      *
      * @param func Optional custom log function
      */
-    ServerConfig(LogFunction func = {});
+    explicit ServerConfig(LogFunction func = {});
 
     /**
      * Create server config with minimal configuration.

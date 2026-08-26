@@ -42,7 +42,7 @@ public:
      * Security policies:
      * - [None](http://opcfoundation.org/UA/SecurityPolicy#None)
      */
-    ClientConfig(LogFunction func = {});
+    explicit ClientConfig(LogFunction func = {});
 
 #ifdef UA_ENABLE_ENCRYPTION
     /**
