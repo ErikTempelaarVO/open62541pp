@@ -71,7 +71,7 @@ ClientConfig::ClientConfig(LogFunction func) {
 #if UAPP_OPEN62541_VER_GE(1, 4)
     if (func) {
         auto adapter = std::make_unique<LoggerDefault>(std::move(func));
-        auto logger = static_cast<UA_Logger*>(UA_malloc(sizeof(UA_Logger)));
+        auto* logger = static_cast<UA_Logger*>(UA_malloc(sizeof(UA_Logger)));  // NOLINT
         *logger = adapter.release()->create(true);
         handle()->logging = logger;  // set logger before setup to log potential errors
     }
@@ -85,7 +85,7 @@ ClientConfig::ClientConfig(LogFunction func) {
         detail::clear(handle()->logger);
         
         auto adapter = std::make_unique<LoggerDefault>(std::move(func));
-        auto logger = static_cast<UA_Logger*>(UA_malloc(sizeof(UA_Logger)));
+        auto* logger = static_cast<UA_Logger*>(UA_malloc(sizeof(UA_Logger)));  // NOLINT
         *logger = adapter.release()->create(true);
         handle()->logger = *logger;  // copy logger after setup (setDefault overwrites it)
         UA_free(logger);  // in older versions, logger is embedded, so free the allocated copy
@@ -104,7 +104,7 @@ ClientConfig::ClientConfig(
 #if UAPP_OPEN62541_VER_GE(1, 4)
     if (func) {
         auto adapter = std::make_unique<LoggerDefault>(std::move(func));
-        auto logger = static_cast<UA_Logger*>(UA_malloc(sizeof(UA_Logger)));
+        auto* logger = static_cast<UA_Logger*>(UA_malloc(sizeof(UA_Logger)));  // NOLINT
         *logger = adapter.release()->create(true);
         handle()->logging = logger;  // set logger before encryption setup to log potential errors
     }
@@ -126,7 +126,7 @@ ClientConfig::ClientConfig(
         detail::clear(handle()->logger);
         
         auto adapter = std::make_unique<LoggerDefault>(std::move(func));
-        auto logger = static_cast<UA_Logger*>(UA_malloc(sizeof(UA_Logger)));
+        auto* logger = static_cast<UA_Logger*>(UA_malloc(sizeof(UA_Logger)));  // NOLINT
         *logger = adapter.release()->create(true);
         handle()->logger = *logger;  // copy logger after setup (setDefaultEncryption overwrites it)
         UA_free(logger);  // in older versions, logger is embedded, so free the allocated copy

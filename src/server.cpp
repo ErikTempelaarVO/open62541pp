@@ -30,7 +30,7 @@ ServerConfig::ServerConfig(LogFunction func) {
 #if UAPP_OPEN62541_VER_GE(1, 4)
     if (func) {
         auto adapter = std::make_unique<LoggerDefault>(std::move(func));
-        auto logger = static_cast<UA_Logger*>(UA_malloc(sizeof(UA_Logger)));
+        auto* logger = static_cast<UA_Logger*>(UA_malloc(sizeof(UA_Logger)));  // NOLINT
         *logger = adapter.release()->create(true);
         handle()->logging = logger;  // set logger before config setup to log potential errors
     }
@@ -44,7 +44,7 @@ ServerConfig::ServerConfig(LogFunction func) {
         detail::clear(handle()->logger);
         
         auto adapter = std::make_unique<LoggerDefault>(std::move(func));
-        auto logger = static_cast<UA_Logger*>(UA_malloc(sizeof(UA_Logger)));
+        auto* logger = static_cast<UA_Logger*>(UA_malloc(sizeof(UA_Logger)));  // NOLINT
         *logger = adapter.release()->create(true);
         handle()->logger = *logger;  // copy logger after setup (setDefault overwrites it)
         UA_free(logger);  // in older versions, logger is embedded, so free the allocated copy
@@ -56,7 +56,7 @@ ServerConfig::ServerConfig(uint16_t port, const ByteString& certificate, LogFunc
 #if UAPP_OPEN62541_VER_GE(1, 4)
     if (func) {
         auto adapter = std::make_unique<LoggerDefault>(std::move(func));
-        auto logger = static_cast<UA_Logger*>(UA_malloc(sizeof(UA_Logger)));
+        auto* logger = static_cast<UA_Logger*>(UA_malloc(sizeof(UA_Logger)));  // NOLINT
         *logger = adapter.release()->create(true);
         handle()->logging = logger;  // set logger before config setup to log potential errors
     }
@@ -72,7 +72,7 @@ ServerConfig::ServerConfig(uint16_t port, const ByteString& certificate, LogFunc
         detail::clear(handle()->logger);
         
         auto adapter = std::make_unique<LoggerDefault>(std::move(func));
-        auto logger = static_cast<UA_Logger*>(UA_malloc(sizeof(UA_Logger)));
+        auto* logger = static_cast<UA_Logger*>(UA_malloc(sizeof(UA_Logger)));  // NOLINT
         *logger = adapter.release()->create(true);
         handle()->logger = *logger;  // copy logger after setup (setMinimal overwrites it)
         UA_free(logger);  // in older versions, logger is embedded, so free the allocated copy
@@ -93,7 +93,7 @@ ServerConfig::ServerConfig(
 #if UAPP_OPEN62541_VER_GE(1, 4)
     if (func) {
         auto adapter = std::make_unique<LoggerDefault>(std::move(func));
-        auto logger = static_cast<UA_Logger*>(UA_malloc(sizeof(UA_Logger)));
+        auto* logger = static_cast<UA_Logger*>(UA_malloc(sizeof(UA_Logger)));  // NOLINT
         *logger = adapter.release()->create(true);
         handle()->logging = logger;  // set logger before config setup to log potential errors
     }
@@ -118,7 +118,7 @@ ServerConfig::ServerConfig(
         detail::clear(handle()->logger);
         
         auto adapter = std::make_unique<LoggerDefault>(std::move(func));
-        auto logger = static_cast<UA_Logger*>(UA_malloc(sizeof(UA_Logger)));
+        auto* logger = static_cast<UA_Logger*>(UA_malloc(sizeof(UA_Logger)));  // NOLINT
         *logger = adapter.release()->create(true);
         handle()->logger = *logger;  // copy logger after setup (setDefaultWithSecurityPolicies overwrites it)
         UA_free(logger);  // in older versions, logger is embedded, so free the allocated copy
