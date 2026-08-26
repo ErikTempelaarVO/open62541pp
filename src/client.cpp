@@ -81,6 +81,9 @@ ClientConfig::ClientConfig(LogFunction func) {
 
 #if UAPP_OPEN62541_VER_LE(1, 3)
     if (func) {
+        // Clear the default logger created by UA_ClientConfig_setDefault
+        detail::clear(handle()->logger);
+        
         auto adapter = std::make_unique<LoggerDefault>(std::move(func));
         auto logger = static_cast<UA_Logger*>(UA_malloc(sizeof(UA_Logger)));
         *logger = adapter.release()->create(true);
@@ -119,6 +122,9 @@ ClientConfig::ClientConfig(
 
 #if UAPP_OPEN62541_VER_LE(1, 3)
     if (func) {
+        // Clear the default logger created by UA_ClientConfig_setDefaultEncryption
+        detail::clear(handle()->logger);
+        
         auto adapter = std::make_unique<LoggerDefault>(std::move(func));
         auto logger = static_cast<UA_Logger*>(UA_malloc(sizeof(UA_Logger)));
         *logger = adapter.release()->create(true);

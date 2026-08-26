@@ -40,6 +40,9 @@ ServerConfig::ServerConfig(LogFunction func) {
 
 #if UAPP_OPEN62541_VER_LE(1, 3)
     if (func) {
+        // Clear the default logger created by UA_ServerConfig_setDefault
+        detail::clear(handle()->logger);
+        
         auto adapter = std::make_unique<LoggerDefault>(std::move(func));
         auto logger = static_cast<UA_Logger*>(UA_malloc(sizeof(UA_Logger)));
         *logger = adapter.release()->create(true);
@@ -65,6 +68,9 @@ ServerConfig::ServerConfig(uint16_t port, const ByteString& certificate, LogFunc
 
 #if UAPP_OPEN62541_VER_LE(1, 3)
     if (func) {
+        // Clear the default logger created by UA_ServerConfig_setMinimal
+        detail::clear(handle()->logger);
+        
         auto adapter = std::make_unique<LoggerDefault>(std::move(func));
         auto logger = static_cast<UA_Logger*>(UA_malloc(sizeof(UA_Logger)));
         *logger = adapter.release()->create(true);
@@ -108,6 +114,9 @@ ServerConfig::ServerConfig(
 
 #if UAPP_OPEN62541_VER_LE(1, 3)
     if (func) {
+        // Clear the default logger created by UA_ServerConfig_setDefaultWithSecurityPolicies
+        detail::clear(handle()->logger);
+        
         auto adapter = std::make_unique<LoggerDefault>(std::move(func));
         auto logger = static_cast<UA_Logger*>(UA_malloc(sizeof(UA_Logger)));
         *logger = adapter.release()->create(true);
